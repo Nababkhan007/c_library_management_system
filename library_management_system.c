@@ -146,7 +146,7 @@ void userPanel(){
     switch(number)
     {
         case 1:
-            printf("Add User\n");
+            addUser();
             break;
         case 2:
             printf("Modify User\n");
@@ -173,6 +173,75 @@ void userPanel(){
             printf("Invalid Input!");
             Sleep(2000);
             userPanel();
+    }
+}
+
+// User Functions
+// Creates new file if old does not exist and saves user records in it
+void addUser(){
+
+label1:
+
+    system("cls");
+    fflush(stdin);
+
+    char fname[255], lname[255];
+    char gender;
+    double sid, phone;
+
+    FILE *pF = fopen("user_records.txt", "ab+");
+
+    if(pF != NULL)
+    {
+        printf("Enter the First Name: ");
+        gets(fname) ;
+
+        printf("Enter the Last Name: ");
+        gets(lname);
+
+        printf("Enter Gender [M/F]: ");
+        scanf("%c",&gender);
+
+        printf("Enter Student ID: ");
+        scanf("%lf",&sid);
+
+        printf("Enter Phone Number: ");
+        scanf("%lf",&phone);
+
+        fprintf(pF, "%s %s %c %.0lf %.0lf \n", fname, lname, gender, sid, phone);
+
+        printf("\n>>> User Record Added Successfully <<< \n");
+
+    }
+    else
+    {
+        printf("Unable to open/locate the file.");
+    }
+
+    fclose(pF);
+
+    fflush(stdin);
+
+    //retry screen
+    char input;
+    printf("\nDo you want to enter more records [y/N]: ");
+    scanf("%c",&input);
+
+    if(input == 'y' || input=='Y')
+    {
+        goto label1;
+    }
+    else if(input == 'n' || input == 'N')
+    {
+        printf("\nRedirecting to User Panel.");
+        Sleep(2000);
+        userPanel();
+    }
+    else
+    {
+        printf("\nInvalid input. Redirecting to User Panel.");
+        Sleep(2000);
+        userPanel();
     }
 }
 
