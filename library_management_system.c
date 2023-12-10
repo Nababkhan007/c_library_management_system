@@ -158,6 +158,7 @@ void userPanel(){
             printf("Rent List\n");
             break;
         case 5:
+            searchUser(0);
             printf("Search User\n");
             break;
         case 6:
@@ -381,6 +382,76 @@ void listUser(){
     printf("Press any key to get back to User Panel.\n");
     getch();
     userPanel();
+}
+
+// this checks if the specified user exists in the records or not
+int searchUser(int nameSearcher){
+
+label2:
+
+    system("cls");
+    fflush(stdin);
+
+    char fname[255], lname[255], gender[5];
+    double sid, phone;
+
+    int flag = 0;
+    int compare;
+    char find[255];
+
+    (nameSearcher != 3) ? printf("Search by First name of the student: ") : printf("Search by First name of the student who wants to rent book: ");
+    gets(find);
+
+    FILE *pF = fopen("user_records.txt", "r");
+
+     while(fscanf(pF, "%s %s %s %lf %lf \n", fname, lname, gender, &sid, &phone) != EOF)
+    {
+        //strcmp(variable, variable1) -- if both the strings are equal then it will return 0 otherwise a random number.
+        compare = strcmp(find, fname);
+
+        if(compare == 0)
+        {
+            if(nameSearcher != 3)
+            {
+                strcat(fname, " ");
+                strcat(fname, lname);
+
+                printf("\n---------------------\n");
+                printf(">>> Record Found <<< \n");
+                printf("---------------------\n\n");
+
+                printf("-------------------------------\n");
+                printf("> Full Name: %s \n", fname);
+                printf("> Gender: %s \n", gender);
+                printf("> Student-ID: %.0lf \n", sid);
+                printf("> Phone Number: %.0lf \n", phone);
+                printf("-------------------------------\n\n");
+
+            }
+            //strcpy(rentName, fname);
+            flag = 1;
+        }
+    }
+
+    fclose(pF);
+
+    if(flag == 0)
+    {
+        printf("\n>>> Record Not Found <<< \n\n");
+    }
+
+    fflush(stdin);
+
+    if(nameSearcher != 3)
+    {
+        printf("Press any key to redirect back to Panel.");
+        getch();
+        userPanel();
+    }
+    else if(nameSearcher == 3 && flag == 1)
+    {
+        return 5;
+    }
 }
 
 
