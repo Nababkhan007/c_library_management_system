@@ -152,7 +152,7 @@ void userPanel(){
             modifyUser();
             break;
         case 3:
-            printf("List User\n");
+            listUser();
             break;
         case 4:
             printf("Rent List\n");
@@ -334,6 +334,52 @@ void modifyUser(){
     fflush(stdin);
 
     Sleep(2000);
+    userPanel();
+}
+
+// Lists all the user records from user_records.txt file
+void listUser(){
+
+    system("cls");
+    fflush(stdin);
+
+    FILE *pF = fopen("user_records.txt", "r");
+
+    char fname[255], lname[255], gender[5];
+    double sid, phone;
+    int counter = 0;
+
+    printf("-------------------------------\n");
+    printf(">>> List of Users Record <<< \n");
+    printf("-------------------------------\n\n");
+
+    while(fscanf(pF, "%s %s %s %lf %lf \n", fname, lname, gender, &sid, &phone) != EOF)
+    {
+       strcat(fname, " ");
+       strcat(fname, lname);
+
+        printf("-------------------------------\n");
+        printf("> Full Name: %s \n", fname);
+        //printf("> Last Name: %s \n", lname);
+        printf("> Gender: %s \n", gender);
+        printf("> Student-ID: %.0lf \n", sid);
+        printf("> Phone No.: %.0lf \n", phone);
+        printf("-------------------------------\n\n\n");
+
+        counter++;
+    }
+
+    fclose(pF);
+
+    if(counter == 0)
+    {
+        printf("-------------------------------------\n");
+        printf("There is no user records added yet...\n");
+        printf("--------------------------------------\n\n");
+    }
+
+    printf("Press any key to get back to User Panel.\n");
+    getch();
     userPanel();
 }
 
