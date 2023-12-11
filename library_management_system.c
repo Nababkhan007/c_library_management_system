@@ -159,10 +159,9 @@ void userPanel(){
             break;
         case 5:
             searchUser(0);
-            printf("Search User\n");
             break;
         case 6:
-            printf("Delete User\n");
+            deleteUser();
             break;
         case 7:
             menu();
@@ -453,5 +452,82 @@ label2:
         return 5;
     }
 }
+
+// deletes the user information from user_records.txt file
+void deleteUser(){
+
+    system("cls");
+    fflush(stdin);
+
+    char fname[255], lname[255], gender[5];
+    char fname1[255], lname1[255], gender1[5];
+    double sid, sid1, phone, phone1;
+
+    int compare, flag = 0;
+
+    char find[255];
+    printf("Enter the name of the person you want to delete the detail: ");
+    gets(find);
+
+    fflush(stdin);
+
+    FILE *pF = fopen("user_records.txt", "r");
+    FILE *pT = fopen("temporary.txt", "a");
+
+    while(fscanf(pF, "%s %s %s %lf %lf \n", fname, lname, gender, &sid, &phone) != EOF)
+    {
+        compare = strcmp(find, fname);
+        if(compare == 0)
+        {
+            printf("\n---------------------------------------------\n");
+            printf(">>> Record Deleted <<<\n");
+            printf("-----------------------------------------------\n\n");
+            printf("Redirecting to User Panel...");
+
+
+            flag = 1;
+        }
+        else
+        {
+            fprintf(pT, "%s %s %s %.0lf %.0lf \n", fname, lname, gender, sid, phone);
+        }
+    }
+
+    fclose(pF);
+    fclose(pT);
+
+    fflush(stdin);
+
+    pF = fopen("user_records.txt", "w");
+    fclose(pF);
+
+    if(flag == 0)
+    {
+        printf("\n\n-------------------------------\n");
+        printf(">>> Record Not Found <<<\n");
+        printf("-------------------------------\n\n");
+        printf("Redirecting to User Panel...");
+    }
+
+    pF = fopen("user_records.txt", "a");
+    pT = fopen("temporary.txt", "r");
+
+    while(fscanf(pT, "%s %s %s %lf %lf \n", fname, lname, gender, &sid, &phone) != EOF)
+    {
+        fprintf(pF, "%s %s %s %.0lf %.0lf \n", fname, lname, gender, sid, phone);
+    }
+
+    fclose(pF);
+    fclose(pT);
+
+    pT = fopen("temporary.txt", "w");
+    fclose(pT);
+
+    fflush(stdin);
+
+    Sleep(2000);
+    userPanel();
+}
+
 
 
