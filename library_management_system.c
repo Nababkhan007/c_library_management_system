@@ -109,7 +109,7 @@ void menu(){
             userPanel();
             break;
         case 2:
-            printf("Book panel\n");
+            bookPanel();
             break;
         default:
             printf("\n>>> Invalid Input! <<<");
@@ -527,6 +527,132 @@ void deleteUser(){
 
     Sleep(2000);
     userPanel();
+}
+
+// Book Panel sub-functions
+void bookPanel(){
+
+    system("cls");
+    fflush(stdin);
+
+    int number;
+
+    printf("-----------------------------------------------\n");
+    printf(">>> Library Management System - Book Panel <<< \n");
+    printf("-----------------------------------------------\n\n");
+    printf("> 1. Add Book \n");
+    printf("> 2. Modify Book \n");
+    printf("> 3. List Book \n");
+    printf("> 4. Rent Book \n");
+    printf("> 5. Search Book \n");
+    printf("> 6. Delete Book \n");
+    printf("> 7. Open Main Menu \n");
+    printf("> 8. Close the Program... \n");
+
+    printf("\nEnter the number & hit ENTER: ");
+    scanf("%d", &number);
+
+    fflush(stdin);
+
+    switch(number)
+    {
+        case 1:
+            addBook();
+            break;
+        case 2:
+            printf("Modify Book");
+            break;
+        case 3:
+            printf("List Book");
+            break;
+        case 4:
+            printf("Rent Book");
+            break;
+        case 5:
+            printf("Search Book");
+            break;
+        case 6:
+            printf("Delete Book");
+            break;
+        case 7:
+            menu();
+            break;
+        case 8:
+            printf("End Screen");
+            break;
+        default:
+            printf("Invalid Input!");
+            Sleep(2000);
+            bookPanel();
+    }
+}
+
+// Book Functions
+// add the books record in book_records.txt file
+void addBook(){
+
+label3:
+
+    system("cls");
+    fflush(stdin);
+
+    char name[255], author[255], publisher[255];
+    double bookid, quantity;
+
+    FILE *pF = fopen("book_records.txt", "ab+");
+
+    if(pF != NULL)
+    {
+        printf("Enter Book Name: ");
+        gets(name);
+
+        printf("Enter Book Author: ");
+        gets(author);
+
+        printf("Enter Book Publisher: ");
+        gets(publisher);
+
+        fflush(stdin);
+
+        printf("Enter Book ID: ");
+        scanf("%lf", &bookid);
+
+        printf("Enter Book Quantity: ");
+        scanf("%lf", &quantity);
+
+        fprintf(pF, "%s %s %s %.0lf %.0lf \n", name, author, publisher, bookid, quantity);
+
+        printf("\n>>> Book Record Added Successfully <<< \n");
+    }
+    else
+    {
+        printf("Unable to open/locate the file.");
+    }
+
+    fclose(pF);
+
+    fflush(stdin);
+
+    char input;
+    printf("\nDo you wanna enter more records [y/N]: ");
+    scanf("%c", &input);
+
+    if(input == 'y' || input=='Y')
+    {
+        goto label3;
+    }
+    else if(input=='n' || input=='N')
+    {
+        printf("\nRedirecting to Book Panel.");
+        Sleep(2000);
+        bookPanel();
+    }
+    else
+    {
+        printf("\nInvalid input. Redirecting to Book Panel.");
+        Sleep(2000);
+        bookPanel();
+    }
 }
 
 
