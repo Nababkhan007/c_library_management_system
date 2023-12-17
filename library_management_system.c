@@ -560,7 +560,7 @@ void bookPanel(){
             addBook();
             break;
         case 2:
-            printf("Modify Book");
+            modifyBook();
             break;
         case 3:
             printf("List Book");
@@ -650,6 +650,118 @@ label3:
     else
     {
         printf("\nInvalid input. Redirecting to Book Panel.");
+        Sleep(2000);
+        bookPanel();
+    }
+}
+
+// edits the book details according to you and saves it again
+int modifyBook(int rentModifier) {
+
+    system("cls");
+    fflush(stdin);
+
+    char name[255], author[255], publisher[255];
+    double bookid, quantity;
+
+    char name1[255], author1[255], publisher1[255];
+    double bookid1, quantity1;
+
+    int flag=0;
+    int compare;
+    char find[255];
+
+    if (rentModifier != 5)
+    {
+        printf("Enter the name of the book you want to see the detail: ");
+        gets(find);
+        fflush(stdin);
+    }
+    else
+    {
+        strcpy(find, name);
+    }
+
+    FILE *pF = fopen("book_records.txt", "r");
+    FILE *pT = fopen("temporary.txt", "a");
+
+    while(fscanf(pF, "%s %s %s %lf %lf \n", name, author, publisher, &bookid, &quantity) != EOF)
+    {
+        compare = strcmp(find, name);
+
+        if(compare == 0)
+        {
+            if(rentModifier != 5)
+            {
+                printf("\n---------------------------------------------\n");
+                printf(">>> Record Found, Allowing Modifications <<<\n");
+                printf("-----------------------------------------------\n\n");
+
+                printf("> Enter Book Name: ");
+                gets(name1);
+
+                printf("> Enter Author: ");
+                gets(author1);
+
+                printf("> Enter Publisher: ");
+                gets(publisher1);
+
+                fflush(stdin);
+
+                printf("> Enter Book ID: ");
+                scanf("%lf",&bookid1);
+
+                printf("> Enter Quantity: ");
+                scanf("%lf",&quantity1);
+
+                fprintf(pT, "%s %s %s %.0lf %.0lf \n", name1, author1, publisher1, bookid1, quantity1);
+                printf("\n\nProcessing your changes....");
+            }
+            else
+            {
+                //quantity = bookStock;
+                fprintf(pT, "%s %s %s %.0lf %.0lf \n", name, author, publisher, bookid, quantity);
+            }
+            flag = 1;
+        }
+        else
+        {
+            fprintf(pT, "%s %s %s %.0lf %.0lf \n", name, author, publisher, bookid, quantity);
+        }
+    }
+
+    fclose(pF);
+    fclose(pT);
+
+    fflush(stdin);
+
+    pF = fopen("book_records.txt", "w");
+    fclose(pF);
+
+    if(flag == 0)
+    {
+        printf("\n\n-------------------------------\n");
+        printf(">>> Record Not Found <<<\n");
+        printf("-------------------------------\n\n");
+        printf("Redirecting to Book Panel...");
+    }
+
+    pF = fopen("book_records.txt", "a");
+    pT = fopen("temporary.txt", "r");
+
+    while(fscanf(pT, "%s %s %s %lf %lf \n", name, author, publisher, &bookid, &quantity) != EOF)
+    {
+        fprintf(pF, "%s %s %s %.0lf %.0lf \n", name, author, publisher, bookid, quantity);
+    }
+
+    fclose(pF);
+    fclose(pT);
+
+    pT = fopen("temporary.txt", "w");
+    fclose(pT);
+
+    if(rentModifier != 5)
+    {
         Sleep(2000);
         bookPanel();
     }
