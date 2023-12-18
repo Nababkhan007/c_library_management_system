@@ -563,7 +563,7 @@ void bookPanel(){
             modifyBook();
             break;
         case 3:
-            printf("List Book");
+            listBook();
             break;
         case 4:
             printf("Rent Book");
@@ -765,6 +765,48 @@ int modifyBook(int rentModifier) {
         Sleep(2000);
         bookPanel();
     }
+}
+
+// lists all the book record from the book_records.txt file
+void listBook(){
+
+    system("cls");
+    fflush(stdin);
+
+    char name[255], author[255], publisher[255];
+    double quantity, bookid;
+    int counter = 0;
+
+    FILE *pF = fopen("book_records.txt", "r");
+
+    printf("-------------------------------\n");
+    printf(">>> List of Books Record <<< \n");
+    printf("-------------------------------\n\n");
+
+    while(fscanf(pF, "%s %s %s %lf %lf \n", name, author, publisher, &bookid, &quantity) != EOF)
+    {
+        printf("-------------------------------\n");
+        printf("> Book Name: %s \n", name);
+        printf("> Author: %s \n", author);
+        printf("> Publisher: %s\n", publisher);
+        printf("> Book ID: %.0lf \n", bookid);
+        printf("> Quantity: %.0lf \n", quantity);
+        printf("-------------------------------\n\n\n");
+        counter++;
+    }
+
+    fclose(pF);
+
+    if(counter == 0)
+    {
+        printf("-------------------------------------\n");
+        printf("There is no book records added yet...\n");
+        printf("--------------------------------------\n\n");
+    }
+
+    printf("Press any key to get back to Book Panel.\n");
+    getch();
+    bookPanel();
 }
 
 
