@@ -1,3 +1,5 @@
+
+// Pre-Defined Header Files
 #include<stdio.h>
 #include<conio.h>
 #include<string.h>
@@ -9,9 +11,33 @@
 #define TAB 9
 #define BKSP 8
 
+// System Operation Functions
+void password(void);
+void menu(void);
+void userPanel(void);
+void bookPanel(void);
+void endScreen(void);
+
+// User Operation Functions
+void addUser(void);
+void modifyUser(void);
+void listUser(void);
+int searchUser(int);
+void rentList(void);
+void deleteUser(void);
+
+// Book Operation Functions
+void addBook(void);
+int modifyBook(int);
+void listBook(void);
+void rentBook(void);
+int searchBook(int);
+void deleteBook(void);
+
+// Main Function
 int main() {
 
-    printf("Welcome to our Library Management System!\nLoading...\n");
+    printf("######## Welcome to our Library Management System! ########\nLoading...\n");
 
     Sleep(2000);
 
@@ -22,6 +48,8 @@ int main() {
 
 // System Functions
     int passTerminator = 1;
+    int bookStock = 0;
+    char rentName[255], bookName[255];
 
 // If the user enters invalid password 3 times then the program gets terminated.
 // Password: manager
@@ -35,9 +63,9 @@ void password(){
     int i = 0;
 	char ch;
 
-    printf("--------------------\n");
-    printf(">>> Login First <<<\n");
-    printf("--------------------\n\n");
+    printf("-------------------------------------------\n");
+    printf(">>>>>>>>>>>>>>> Login First <<<<<<<<<<<<<<<\n");
+    printf("-------------------------------------------\n\n");
 
 	printf("Enter your password. Hit ENTER to confirm. \n");
 	printf("Password:");
@@ -72,13 +100,13 @@ void password(){
     // verifies the password
     if(strcmp(code, pwd) == 0)
     {
-        printf("\nLogin Successful!\nLoading...\n");
+        printf("\n\nLogin Successful!\n\nLoading...\n");
         Sleep(2000);
         menu();
     }
     else
     {
-        printf("\nInvalid Password!\n");
+        printf("\n\nInvalid Password!\n");
         (passTerminator == 3) ? exit(0) : passTerminator++;
         Sleep(2000);
         password();
@@ -155,7 +183,7 @@ void userPanel(){
             listUser();
             break;
         case 4:
-            printf("Rent List\n");
+            rentList();
             break;
         case 5:
             searchUser(0);
@@ -167,7 +195,7 @@ void userPanel(){
             menu();
             break;
         case 8:
-            printf("End Screen\n");
+            endScreen();
             break;
         default:
             printf("Invalid Input!");
@@ -560,25 +588,25 @@ void bookPanel(){
             addBook();
             break;
         case 2:
-            modifyBook();
+            modifyBook(0);
             break;
         case 3:
             listBook();
             break;
         case 4:
-            printf("Rent Book");
+            rentBook();
             break;
         case 5:
-            printf("Search Book");
+            searchBook(0);
             break;
         case 6:
-            printf("Delete Book");
+            deleteBook();
             break;
         case 7:
             menu();
             break;
         case 8:
-            printf("End Screen");
+            endScreen();
             break;
         default:
             printf("Invalid Input!");
@@ -719,7 +747,7 @@ int modifyBook(int rentModifier) {
             }
             else
             {
-                //quantity = bookStock;
+                quantity = bookStock;
                 fprintf(pT, "%s %s %s %.0lf %.0lf \n", name, author, publisher, bookid, quantity);
             }
             flag = 1;
@@ -809,5 +837,303 @@ void listBook(){
     bookPanel();
 }
 
+// Book Rental function
+// first it checks whether the user is already registered in the user_records.txt or not
+// second it checks whether the book exists in the user_records.txt or not
+// third it checks if the book quantity is atleast 1, throws error if the book is OUT OF STOCK -- it also reduces book quantity by 1 from book_recprds.txt
+// fourth it registers the user name & book name in a new file rent_records.txt and saves it :)
+void rentBook(){
+
+    int terminator = 1, nameFound, bookFound;
+
+label5:
+
+    fflush(stdin);
+
+    // check if user exists
+    nameFound = searchUser(3);
+
+    if(nameFound != 5 && terminator != 4)
+    {
+        printf("Press any key to re-enter the name. \n");
+        getch();
+        (terminator == 3) ? bookPanel() : terminator++;
+        goto label5;
+    }
+    else if(nameFound == 5)
+    {
+        printf("\nUser Found in Records! \nPlease wait... \n");
+        terminator = 1;
+        Sleep(2000);
+    }
+
+label6:
+
+    fflush(stdin);
+
+    // check if book exists
+    bookFound = searchBook(3);
+
+    if(bookFound != 5 && terminator != 4)
+    {
+        printf("Press any key to re-enter the name. \n");
+        getch();
+        (terminator == 3) ? bookPanel() : terminator++;
+        goto label6;
+    }
+    else if(bookFound == 5)
+    {
+        // check if book quantity is > 0
+        if(bookStock > 0)
+        {
+            printf("\nBook Found & In-Stock! \nPlease wait... \n");
+        }
+        else
+        {
+            printf("\nSorry, Out of Stock! \nPlease wait... ");
+            Sleep(2000);
+            (terminator == 3) ? bookPanel() : terminator++;
+            goto label6;
+        }
+    }
+
+    fflush(stdin);
+
+    if(nameFound == 5 && bookFound == 5)
+    {
+        // Adding record in rent_records.txt file
+        FILE *pF = fopen("rent_records.txt", "ab+");
+
+        if(pF != NULL)
+        {
+            fprintf(pF, "%s %s \n", rentName, bookName);
+        }
+        else
+        {
+            printf("Unable to open/locate the file.");
+        }
+
+        fclose(pF);
+
+        // reducing quantity of book by 1
+        bookStock--;
+        modifyBook(5);
+
+        printf("---------------------------------------------\n");
+        printf(">>> Rent Record Added Successfully <<< \n");
+        printf("---------------------------------------------\n");
+
+        printf("\nRedirecting to Book Panel...\n");
+        Sleep(3500);
+        bookPanel();
+    }
+}
+
+// lists all the username & booknames which are rented to someone in registered files
+void rentList(){
+
+    system("cls");
+    fflush(stdin);
+
+    char rentListUser[255], rentListBook[255];
+    int counter = 0;
+
+    FILE *pF = fopen("rent_records.txt", "r");
+
+    printf("-------------------------------\n");
+    printf(">>> List of Books Rental <<< \n");
+    printf("-------------------------------\n\n");
+
+    while(fscanf(pF, "%s %s \n", rentListUser, rentListBook) != EOF)
+    {
+        printf("> Rent User: %s \n", rentListUser);
+        printf("> Rent Book(s): %s \n\n", rentListBook);
+
+        counter++;
+    }
+
+    fclose(pF);
+    fflush(stdin);
+
+    if(counter == 0)
+    {
+        printf("-------------------------------------\n");
+        printf("There is no rent records added yet...\n");
+        printf("--------------------------------------\n\n");
+    }
+
+    printf("\nPress any key to get back to User Panel.\n");
+    getch();
+    userPanel();
+}
+
+// searches for the book details by book name from the txt file
+int searchBook(int bookSearcher){
+
+label4:
+
+    system("cls");
+    fflush(stdin);
+
+    char name[255], author[255], publisher[255];
+    double bookid, quantity;
+
+    int flag=0;
+    int compare;
+
+    char find[255];
+
+    (bookSearcher != 3) ? printf("Search the book by Author name or Book name: ") : printf("Search the book by Author name or Book name: ");
+    gets(find);
+
+    FILE *pF = fopen("book_records.txt", "r");
+
+    while(fscanf(pF, "%s %s %s %lf %lf \n", name, author, publisher, &bookid, &quantity) != EOF)
+    {
+        compare = strcmp(find, name);
+        compare = strcmp(find, author);
+
+        if(compare == 0)
+        {
+            if(bookSearcher != 3)
+            {
+                printf("\n-------------------------\n");
+                printf(">>> Record Found <<< \n");
+                printf("-------------------------\n\n");
+
+                printf("-------------------------------\n");
+                printf("> Book Name: %s \n", name);
+                printf("> Author: %s \n", author);
+                printf("> Publisher: %s\n", publisher);
+                printf("> Book ID: %.0lf \n", bookid);
+                printf("> Quantity: %.0lf \n", quantity);
+                printf("-------------------------------\n\n");
+            }
+            strcpy(bookName, name);
+            bookStock = quantity;
+            flag=1;
+        }
+    }
+
+    fclose(pF);
+
+    fflush(stdin);
+
+    if(flag == 0)
+    {
+        printf("\n>>> Record Not Found <<< \n\n");
+    }
+
+    if(bookSearcher != 3)
+    {
+        printf("Press any key to redirect to Book Panel.");
+        getch();
+        bookPanel();
+    }
+    else if(bookSearcher == 3 && flag == 1)
+    {
+        return 5;
+    }
+}
+
+// deletes the book records from book_records.txt file
+void deleteBook(){
+
+    system("cls");
+    fflush(stdin);
+
+    char name[255], author[255], publisher[255];
+    double bookid, quantity;
+
+    char name1[255], author1[255], publisher1[255];
+    double bookid1, quantity1;
+
+    int flag=0;
+    int compare;
+
+    char find[255];
+    printf("Enter the name of the book you want to delete the detail: ");
+    gets(find);
+
+    fflush(stdin);
+
+    FILE *pF = fopen("book_records.txt", "r");
+    FILE *pT = fopen("temporary.txt", "a");
+
+    while(fscanf(pF, "%s %s %s %lf %lf \n", name, author, publisher, &bookid, &quantity) != EOF)
+    {
+        compare = strcmp(find, name);
+
+        if(compare == 0)
+        {
+            printf("\n---------------------------------------------\n");
+            printf(">>> Record Deleted <<<\n");
+            printf("-----------------------------------------------\n\n");
+            printf("Redirecting to Book Panel...");
+
+            flag = 1;
+        }
+        else
+        {
+            fprintf(pT, "%s %s %s %.0lf %.0lf \n", name, author, publisher, bookid, quantity);
+        }
+    }
+
+    fclose(pF);
+    fclose(pT);
+
+    fflush(stdin);
+
+    pF = fopen("book_records.txt", "w");
+    fclose(pF);
+
+    if(flag == 0)
+    {
+        printf("\n\n-------------------------------\n");
+        printf(">>> Record Not Found <<<\n");
+        printf("-------------------------------\n\n");
+        printf("Redirecting to Book Panel...");
+    }
+
+    pF = fopen("book_records.txt", "a");
+    pT = fopen("temporary.txt", "r");
+
+    while(fscanf(pT, "%s %s %s %lf %lf \n", name, author, publisher, &bookid, &quantity) != EOF)
+    {
+        fprintf(pF, "%s %s %s %.0lf %.0lf \n", name, author, publisher, bookid, quantity);
+    }
+
+    fclose(pF);
+    fclose(pT);
+
+    pT = fopen("temporary.txt", "w");
+    fclose(pT);
+
+    Sleep(2000);
+    bookPanel();
+}
+
+// Program end screen
+void endScreen(){
+
+    system("cls");
+    fflush(stdin);
+
+    printf("------------------------------------------------------------\n");
+    printf(">>>>>>>>>>>>>>>>>>>>>>> Team Members <<<<<<<<<<<<<<<<<<<<<<< \n");
+    printf("------------------------------------------------------------\n\n");
+
+    printf(">>>>> Name: Md Roni Hossain | ID: 42230100592 <<<<<\n");
+    printf(">>>>> Name: Fazle Lohany Khan | ID: 42230200727 <<<<<\n");
+    printf(">>>>> Name: Anik Saha | ID: 42230200736 <<<<<\n");
+    printf(">>>>> Name: Shakiruzzaman | ID: 42230200749 <<<<<\n");
+    printf(">>>>> Name: Fa Mim Fozle Rabbi | ID: 42230200757 <<<<<\n");
+    printf(">>>>> Name: Bilash Chandra Sarker | ID: 42230200759 <<<<<\n\n\n\n\n");
+    printf(">>>>> Main project creator: @Alkaison (Ganesh Mourya) <<<<<\n");
+
+    exit(0);
+}
+
+// Program Ends here -- Happy coding! :)
 
 
