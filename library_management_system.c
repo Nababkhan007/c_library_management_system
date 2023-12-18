@@ -455,7 +455,7 @@ label2:
                 printf("-------------------------------\n\n");
 
             }
-            //strcpy(rentName, fname);
+            strcpy(rentName, fname);
             flag = 1;
         }
     }
@@ -707,7 +707,7 @@ int modifyBook(int rentModifier) {
     }
     else
     {
-        strcpy(find, name);
+        strcpy(find, bookName);
     }
 
     FILE *pF = fopen("book_records.txt", "r");
@@ -983,7 +983,7 @@ label4:
 
     char find[255];
 
-    (bookSearcher != 3) ? printf("Search the book by Author name or Book name: ") : printf("Search the book by Author name or Book name: ");
+    (bookSearcher != 3) ? printf("Search the book by Book name: ") : printf("Search the book by Book name: ");
     gets(find);
 
     FILE *pF = fopen("book_records.txt", "r");
@@ -991,7 +991,6 @@ label4:
     while(fscanf(pF, "%s %s %s %lf %lf \n", name, author, publisher, &bookid, &quantity) != EOF)
     {
         compare = strcmp(find, name);
-        compare = strcmp(find, author);
 
         if(compare == 0)
         {
